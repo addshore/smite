@@ -66,10 +66,14 @@ class SmiteStore {
 
 	public function getFullMins() {
 		$seconds = $this->getSeconds();
-		foreach( $seconds as &$second ) {
-			$second = \intdiv( $second, 60 );
+		$mins = [];
+		foreach( $seconds as $key => &$second ) {
+			$min = \intdiv( $second, 60 );
+			if( $min > 0 ) {
+				$mins[$key] = $min;
+			}
 		}
-		return $seconds;
+		return $mins;
 	}
 
 	public function removeMins( $key, $mins ) {
