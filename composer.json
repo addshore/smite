@@ -1,0 +1,16 @@
+{
+  "require": {
+    "syseleven/mite-eleven": "dev-master"
+  },
+  "repositories": [
+    {
+      "type": "vcs",
+      "url": "https://github.com/syseleven/mite-eleven.git"
+    }
+  ],
+  "autoload": {
+    "psr-4": {
+      "Smite\\": "src/"
+    }
+  }
+}
