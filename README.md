@@ -2,6 +2,8 @@
 
 Simple mite
 
+![screenshot](https://upload.wikimedia.org/wikipedia/commons/7/7b/SMite_by_Addshore.PNG)
+
 ##Details
 
 sMite is a PHP web app.
