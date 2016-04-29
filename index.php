@@ -1,6 +1,7 @@
 <?php
 
 use Smite\SmitePage;
+use Smite\SmiteSession;
 use Smite\SmiteStore;
 use SysEleven\MiteEleven\MiteClient;
 use SysEleven\MiteEleven\RestClient;
@@ -44,15 +45,12 @@ $map = [
 function getPage() {
 	global $map;
 	$page = new SmitePage();
-	if( !isset( $_POST['key'] ) && !isset( $_COOKIE['SMITE_KEY'] ) ) {
+	$session = new SmiteSession();
+
+	$apiKey = $session->getCurrentApiKey();
+	if( $apiKey === null ) {
 		$page->addLoginForm();
 		return $page;
-	}
-
-	if( isset( $_POST['key'] ) ) {
-		$apiKey = $_POST['key'];
-	} else {
-		$apiKey = $_COOKIE['SMITE_KEY'];
 	}
 
 	$client = new RestClient('https://wmd.mite.yo.lk',$apiKey);
@@ -65,10 +63,10 @@ function getPage() {
 		$page->addLoginForm('Did you enter your key wrong?');
 		return $page;
 	}
-	setcookie( 'SMITE_KEY', $apiKey );
+	$session->addKeyToCookie( $apiKey );
 
 	if( isset( $_POST['logout'] ) ) {
-		setcookie("SMITE_KEY", "", time() - 3600);
+		$session->removeCookie();
 		$page->addLoginForm("Logged out!");
 		return $page;
 	}
