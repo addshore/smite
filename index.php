@@ -1,5 +1,6 @@
 <?php
 
+use Smite\SmitePage;
 use Smite\SmiteStore;
 use SysEleven\MiteEleven\MiteClient;
 use SysEleven\MiteEleven\RestClient;
@@ -40,47 +41,12 @@ $map = [
 	'MediaWiki' => [ $projectMap['MediaWiki'], $serviceMap['General'] ],
 ];
 
-$output = '';;
-
-function startPage() {
-	global $output;
-	$output .= '<html>';
-	$output .= '<head>';
-	$output .= '</head>';
-	$output .= '<body>';
-}
-
-function endPage() {
-	global $output;
-	$output .= '</body>';
-	$output .= '</html>';
-}
-
-function addLoginForm( $extraMessage = '' ) {
-	global $output;
-	$output .= '<h1>Please enter your API key!</h1>';
-	$output .= '<p>You can get this from <a href="https://wmd.mite.yo.lk/myself">https://wmd.mite.yo.lk/myself</a></p>';
-	$output .= '<form action="index.php" method="post">';
-	$output .= '<input type="text" name="key">';
-	$output .= '<input type="submit" value="Submit">';
-	$output .= '</form>';
-	$output .= '<p>' . $extraMessage . '</p>';
-}
-
-function addButton( $mapName, $key ) {
-	global $output;
-	$output .= '<form action="index.php" method="post">';
-	$output .= '<input type="submit" value="' . $mapName . '">';
-	$output .= "<input type='hidden' name='item' value='" . $mapName . "'>";
-	$output .= "<input type='hidden' name='key' value='" . $key . "'>";
-	$output .= '</form>';
-}
-
-function main() {
-	global $output, $map;
+function getPage() {
+	global $map;
+	$page = new SmitePage();
 	if( !isset( $_POST['key'] ) && !isset( $_COOKIE['SMITE_KEY'] ) ) {
-		addLoginForm();
-		return;
+		$page->addLoginForm();
+		return $page;
 	}
 
 	if( isset( $_POST['key'] ) ) {
@@ -96,15 +62,15 @@ function main() {
 		$client->getMyself();
 	}
 	catch( Exception $e ) {
-		addLoginForm( 'Did you enter your key wrong?' );
-		return;
+		$page->addLoginForm('Did you enter your key wrong?');
+		return $page;
 	}
 	setcookie( 'SMITE_KEY', $apiKey );
 
 	if( isset( $_POST['logout'] ) ) {
 		setcookie("SMITE_KEY", "", time() - 3600);
-		addLoginForm("Logged out!");
-		return;
+		$page->addLoginForm("Logged out!");
+		return $page;
 	}
 
 	if( isset( $_POST['save'] ) ) {
@@ -147,42 +113,14 @@ function main() {
 		}
 	}
 
-	$timers = $store->getRunningTimers();
+	$page->addTimers( $map, $store->getTimer(), $store->getRunningTimers(), $apiKey );
+	$page->addButton( 'STOP', $apiKey );
+	$page->addRecordedSeconds( $store->getSeconds() );
+	$page->addSaveButton( $apiKey );
+	$page->addLogoutButton();
 
-	$output .= "<h2>Start timers</h2>";
-	$output .= "<p>Current timer started at: " . $store->getTimer() . "</p>";
-	foreach( $map as $itemName => list( $projectId, $serviceId ) ) {
-		if( in_array( $itemName, $timers ) ) {
-			$output .= '<p>' . $itemName . ' running</p>';
-		} else {
-			addButton( $itemName, $apiKey );
-		}
-	}
-	addButton( 'STOP', $apiKey );
-
-	$output .= "<h2>Seconds recorded</h2>";
-	$output .= "<ul>";
-	$totalSeconds = 0;
-	foreach( $store->getSeconds() as $secondKey => $seconds ) {
-		$output .= "<li>$secondKey: $seconds</li>";
-		$totalSeconds =+ $seconds;
-	}
-	$output .= "</ul>";
-	$output .= "<p>Total seconds: $totalSeconds</p>";
-
-	$output .= '<form action="index.php" method="post">';
-	$output .= '<input type="submit" value="Save mins">';
-	$output .= "<input type='hidden' name='save' value='save'>";
-	$output .= "<input type='hidden' name='key' value='" . $apiKey . "'>";
-	$output .= '</form>';
-
-	$output .= '<form action="index.php" method="post">';
-	$output .= '<input type="submit" value="Logout">';
-	$output .= "<input type='hidden' name='logout' value='logout'>";
-	$output .= "<input type='hidden' name='key' value='" . $apiKey . "'>";
-	$output .= '</form>';
+	return $page;
 
 }
 
-main();
-echo $output;
+getPage()->output();
