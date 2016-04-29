@@ -30,3 +30,6 @@ Note: the app contains simplified projects which currently come from a hardcoded
  - Users should be able to remove / adjust timers manually?
  - Users should be able to recover their recorded time if they change their API key? Login should perhaps also ask for the email address and validate that?
  - data directory should not be accessible to the wide wide world.
+ - minuitely cron could run and keep submitting data to mite all of the time? (user option)?
+ - The app should display if there is already a mite timer running.
+ - favicon!
