@@ -1,6 +1,7 @@
 {
   "require": {
-    "syseleven/mite-eleven": "dev-master"
+    "syseleven/mite-eleven": "dev-master",
+    "twbs/bootstrap": "3.3.6"
   },
   "repositories": [
     {

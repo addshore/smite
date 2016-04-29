@@ -112,10 +112,7 @@ function getPage() {
 	}
 
 	$page->addTimers( $map, $store->getTimer(), $store->getRunningTimers(), $apiKey );
-	$page->addButton( 'STOP', $apiKey );
-	$page->addRecordedSeconds( $store->getSeconds() );
-	$page->addSaveButton( $apiKey );
-	$page->addLogoutButton();
+	$page->addRecordedSeconds( $store->getSeconds(), $apiKey );
 
 	return $page;
 
